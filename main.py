@@ -180,7 +180,7 @@ if __name__=='__main__':
     repeat=5
     load=False
     d=4
-    N=40 # 40, 60, 80
+    N=10 # 40, 60, 80
     K=5
     print(d, N,K, repeat)
     run_multiprocessing(T,repeat,d,N,K,load)

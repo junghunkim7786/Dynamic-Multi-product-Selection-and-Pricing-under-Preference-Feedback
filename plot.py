@@ -23,7 +23,7 @@ def plot(T,repeat,d):
         std[algorithm]=np.zeros(T,float)
     gs = gridspec.GridSpec(1,3) 
     fig = plt.figure(figsize=(18, 5))
-    for n,N in enumerate([40, 60, 80]):
+    for n,N in enumerate([10, 15, 20]):
         for k,K in enumerate([5]):
             for algorithm in   algorithms:
                 name=algorithm

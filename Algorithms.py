@@ -183,13 +183,21 @@ class UCB:
                 self.v_upper[n]=self.x[n]@self.theta[0:self.d]+self.alpha*np.sqrt(self.x[n]@np.linalg.inv(self.V_v)@self.x[n])
                 self.p[n]=max(self.x[n]@self.theta_fix[0:self.d]-(self.C)**(1/2)*self.alpha*np.sqrt(self.x[n]@np.linalg.inv(self.V_v)@self.x[n]),0)
                                   
+            # R=0
+            # tmp_R=0
+            # utility=self.v_upper*np.exp(self.u_upper)
+            # largest_indices = np.argsort(utility)[-self.K:][::-1]
+            # self.S=largest_indices
             R=0
             tmp_R=0
-            utility=self.v_upper*np.exp(self.u_upper)
-            largest_indices = np.argsort(utility)[-self.K:][::-1]
-            self.S=largest_indices
-            
-                
+            for partition in self.M:
+                if len(partition)>0:                    
+                    tmp_R+=np.sum(self.v_upper[partition]*np.exp(self.u_upper[partition])/(1+np.sum(np.exp(self.u_upper[partition]))))
+                if R<tmp_R:
+                    R=tmp_R
+                    self.S=copy.deepcopy(partition)
+                tmp_R=0
+                                
             self.V_til=self.V+self.eta*self.G(self.S,self.theta) 
             self.V+= self.G(self.S,self.theta) 
             self.V_v+=self.G_v(self.S,self.theta) 
@@ -369,14 +377,24 @@ class TS:
             theta_sample_v=np.random.multivariate_normal(mean_v, cov_v, M)
             for n in range(self.N):
                 self.v_upper[n]=np.max(self.x[n]@theta_sample_v.T)
-                self.u_upper[n]=np.max(self.z[n]@theta_sample.T)+(self.C)*(self.v_upper[n]-mean_v@self.x[n])
+                self.u_upper[n]=np.max(self.z[n]@theta_sample.T)+8*(self.C)*(self.v_upper[n]-mean_v@self.x[n])
                 self.p[n]=max(self.x[n]@self.theta_fix[0:self.d]-(self.C)**(1/2)*self.alpha*np.sqrt(self.x[n]@np.linalg.inv(self.V_v)@self.x[n]),0)
+            # R=0
+            # tmp_R=0
+            
+            # utility=self.v_upper*np.exp(self.u_upper)
+            # largest_indices = np.argsort(utility)[-self.K:][::-1]
+            # self.S=largest_indices
+
             R=0
             tmp_R=0
-            
-            utility=self.v_upper*np.exp(self.u_upper)
-            largest_indices = np.argsort(utility)[-self.K:][::-1]
-            self.S=largest_indices
+            for partition in self.M:
+                if len(partition)>0:                    
+                    tmp_R+=np.sum(self.v_upper[partition]*np.exp(self.u_upper[partition])/(1+np.sum(np.exp(self.u_upper[partition]))))
+                if R<tmp_R:
+                    R=tmp_R
+                    self.S=copy.deepcopy(partition)
+                tmp_R=0
 
             self.V+= self.G(self.S,self.theta) 
             self.V_v+=self.G_v(self.S,self.theta) 
@@ -550,9 +568,22 @@ class Etc:
         optimal_set = []
         optimal_prices = []
         p=self.x@self.theta[0:self.d]
-        utility=p*np.exp(self.x@self.theta[0:self.d]-self.x@self.theta[self.d:2*self.d]*p)
-        largest_indices = np.argsort(utility)[-self.L:][::-1]
-        S=largest_indices
+        
+        # utility=p*np.exp(self.x@self.theta[0:self.d]-self.x@self.theta[self.d:2*self.d]*p)
+        # largest_indices = np.argsort(utility)[-self.L:][::-1]
+        # S=largest_indices
+        
+        
+        R=0
+        tmp_R=0
+        for partition in self.M:
+            if len(partition)>0:                    
+                tmp_R+=np.sum(p*np.exp(self.x@self.theta[0:self.d]-self.x@self.theta[self.d:2*self.d]*p)/(1+np.sum(np.exp(self.x@self.theta[0:self.d]-self.x@self.theta[self.d:2*self.d]*p))))
+            if R<tmp_R:
+                R=tmp_R
+                S=copy.deepcopy(partition)
+            tmp_R=0
+        
         max_revenue = self.exp_reward_obj(S, p[S])
         optimal_set = S
         optimal_prices = p
