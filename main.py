@@ -177,7 +177,7 @@ def run_multiprocessing(T, repeat, d, N, K, load):
 
 if __name__=='__main__':
     T=50000
-    repeat=5
+    repeat=10
     load=False
     d=4
     N=10 # 40, 60, 80
