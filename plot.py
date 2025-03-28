@@ -151,7 +151,7 @@ def plot(T,repeat,d):
 if __name__=='__main__':
     d=4
     T=50000
-    repeat=5
+    repeat=10
     plot(T,repeat,d)
    
 
